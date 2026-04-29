@@ -196,7 +196,7 @@ async function sendOTP(req, res) {
         res.status(200).json({ message: "OTP sent successfully" });
     } catch (err) {
         console.error("Send OTP error:", err);
-        res.status(500).json({ message: "Failed to send OTP" });
+        res.status(500).json({ message: err.message || "Failed to send OTP" });
     }
 }
 
