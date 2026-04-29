@@ -1,16 +1,2 @@
-# Music App Fixes - OTP & PWA 404
+# Email OTP Verification Fix Plan\n\n## Steps:\n- [x] 1. Edit backend/src/services/email.service.js - Add missing sendPasswordResetOTPEmail function\n- [ ] 2. Test email sending using /auth/send-otp endpoint\n- [ ] 3. Verify Gmail App Password configuration (if emails fail)\n- [ ] 4. Test full flow: Register -> Send OTP -> Verify -> Login\n- [ ] 5. Improve frontend redirects (optional)\n\n**Completed**: Added sendPasswordResetOTPEmail to email.service.js. Restart backend server to apply changes.
 
-## Step 1: Fix OTP Email **LOGGING READY**
-- [x] Files updated with detailed console.log (manual check needed)
-- [x] backend/.env created  
-- [ ] **USER ACTION:** Restart backend → test send OTP → paste console logs here
-- [ ] Fix based on logs (Gmail/DB)
-
-## Step 2: PWA 404 Fix (Pending OTP)
-- [ ] vite.config.js base:'/'
-- [ ] sw.js SPA fallback  
-- [ ] Test preview refresh
-
-## Full Test & Deploy (After fixes)
-
-**Next:** Test + paste backend logs!

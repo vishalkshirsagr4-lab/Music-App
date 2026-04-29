@@ -30,4 +30,24 @@ async function sendOTPEmail(to, otp) {
   return await transporter.sendMail(mailOptions);
 }
 
-module.exports = { sendOTPEmail };
+async function sendPasswordResetOTPEmail(to, otp) {
+  const transporter = createTransporter();
+
+  const mailOptions = {
+    from: `"Music App" <vishalkshirsagr4@gmail.com>`,
+    to,
+    subject: 'Password Reset Code',
+    html: `
+      <div style="font-family: Arial; max-width: 480px; margin: auto;">
+        <h2>Reset Your Password</h2>
+        <p>Your OTP is:</p>
+        <h1>${otp}</h1>
+        <p>Expires in 5 minutes. Use this to reset your password.</p>
+      </div>
+    `,
+  };
+
+  return await transporter.sendMail(mailOptions);
+}
+
+module.exports = { sendOTPEmail, sendPasswordResetOTPEmail };
