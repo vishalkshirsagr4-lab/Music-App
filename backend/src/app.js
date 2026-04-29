@@ -11,10 +11,7 @@ app.use(express.json());
 app.use(cookieParser());
 const cors = require("cors");
 
-app.use(cors({
-  origin: "https://music-app-chi-opal.vercel.app",
-  credentials: true
-}));
+app.use(cors());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/music', musicRoutes);
