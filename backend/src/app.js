@@ -12,7 +12,7 @@ app.use(cookieParser());
 const cors = require("cors");
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://music-app-chi-opal.vercel.app/",
   credentials: true
 }));
 
