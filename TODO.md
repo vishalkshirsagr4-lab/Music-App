@@ -1,19 +1,17 @@
-# Fix React 404 Refresh Issue - Task Progress
+# Email OTP & Render Crash Fix - Progress ✅
 
-## Steps (Completed: ✅ | Pending: ⭕)
+## Completed:
+- [x] Plan approved  
+- [x] 1. Created TODO.md  
+- [x] 2. Fixed backend/src/app.js (removed wildcard/static, added 404 handler)  
+- [x] 3. Fixed backend/src/services/email.service.js (hardcoded Gmail creds + cleanup)  
 
-✅ 1. Create TODO.md with plan breakdown  
-✅ 2. Edit backend/src/app.js to add static serve + catch-all route  
-✅ 3. Test locally  
-   - cd backend  
-   - npm start  
-   - Visit http://localhost:3000/login (refresh - should work)  
-⭕ 4. Commit changes  
-   - git add .  
-   - git commit -m "fix: resolve React 404 refresh issue with Express catch-all"  
-   - git push  
-⭕ 5. Deploy on Render  
-   - Manual Deploy → Deploy latest commit  
+## Test & Deploy:
+- [ ] Local test: `cd backend && npm start`, POST /api/auth/send-otp  
+- [ ] Git: `git add . && git commit -m "fix render crash + email otp" && git push`  
+- [ ] Render: Manual Deploy latest commit  
+- [ ] Verify logs + test deployed API  
 
-**Current Status:** Backend ready for 404 fix. Test locally after edit.
+**All code changes done. Ready for testing/deployment.**
+
 

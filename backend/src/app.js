@@ -39,12 +39,9 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/sections', sectionRoutes);
 app.use('/api/test', require('./routes/test.routes'));
 
-// Serve frontend build (Vite)
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-// Handle React Router routes - must be last
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+// 404 handler for unmatched routes (fixes Render path-to-regexp crash)
+app.use((req, res) => {
+  res.status(404).json({ message: 'API route not found' });
 });
 
 module.exports = app;

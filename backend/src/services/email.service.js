@@ -12,9 +12,11 @@ function createTransporter() {
 
 async function sendOTPEmail(to, otp) {
   const transporter = createTransporter();
+  
+
 
   const mailOptions = {
-    from: `"Music App vishalkshirsagr4@gmail.com" <vishalkshirsagr4@gmail.com>`,
+    from: '"Music App" <vishalkshirsagr4@gmail.com>',
     to,
     subject: 'Your Email Verification Code',
     html: `
@@ -41,7 +43,7 @@ async function sendPasswordResetOTPEmail(to, otp) {
   const transporter = createTransporter();
 
   const mailOptions = {
-    from: `"Music App vishalkshirsagr4@gmail.com" <vishalkshirsagr4@gmail.com>`,
+    from: '"Music App" <vishalkshirsagr4@gmail.com>',
     to,
     subject: 'Password Reset Code',
     html: `
