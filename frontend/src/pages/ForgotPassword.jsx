@@ -8,16 +8,17 @@ export default function ForgotPassword() {
 
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [step, setStep] = useState(1); // 1: email, 2: OTP, 3: reset password
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [step, setStep] = useState(1); // 1 = email, 2 = otp, 3 = new password
   const [loading, setLoading] = useState(false);
-  const [countdown, setCountdown] = useState(300); // 5 minutes in seconds
+  const [countdown, setCountdown] = useState(300);
   const [attemptsLeft, setAttemptsLeft] = useState(3);
+  const [otpSent, setOtpSent] = useState(false);
   const [resetToken, setResetToken] = useState("");
+
   const inputRefs = useRef([]);
 
-  // Countdown timer
+  // countdown
   useEffect(() => {
     if (step !== 2) return;
     if (countdown <= 0) return;
@@ -29,368 +30,214 @@ export default function ForgotPassword() {
     return () => clearInterval(timer);
   }, [step, countdown]);
 
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
+  const formatTime = (s) => {
+    const m = Math.floor(s / 60).toString().padStart(2, "0");
+    const sec = (s % 60).toString().padStart(2, "0");
+    return `${m}:${sec}`;
   };
 
+  // Step 1: Send reset OTP
   const handleSendOTP = async (e) => {
     e.preventDefault();
-    if (!email) {
-      toast.error("Please enter your email", {
-        style: { background: "#282828", color: "#fff" },
-      });
-      return;
-    }
+    if (!email) return toast.error("Enter email");
 
     setLoading(true);
     try {
       await API.post("/auth/forgot-password/send-otp", { email });
-      toast.success("OTP sent to your email", {
-        style: { background: "#282828", color: "#fff" },
-      });
+      toast.success("Reset code sent!");
       setStep(2);
       setCountdown(300);
-      setAttemptsLeft(3);
+      setOtpSent(true);
       setOtp(["", "", "", "", "", ""]);
-      // Focus first input
       setTimeout(() => inputRefs.current[0]?.focus(), 100);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to send OTP", {
-        style: { background: "#282828", color: "#fff" },
-      });
+      toast.error(err.response?.data?.message || "Send failed");
     }
     setLoading(false);
   };
 
-  const handleOtpChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value.slice(-1);
-    setOtp(newOtp);
-
-    // Auto-focus next input
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleOtpKeyDown = (index, e) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
+  // Step 2: Verify OTP
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
-    const otpString = otp.join("");
-    if (otpString.length !== 6) {
-      toast.error("Please enter all 6 digits", {
-        style: { background: "#282828", color: "#fff" },
-      });
-      return;
-    }
+    const code = otp.join("");
+    if (code.length !== 6) return toast.error("Enter full OTP");
 
     setLoading(true);
     try {
       const res = await API.post("/auth/forgot-password/verify-otp", {
         email,
-        otp: otpString,
+        otp: code,
       });
-      toast.success(res.data.message, {
-        style: { background: "#282828", color: "#fff" },
-      });
-      if (res.data.resetToken) {
-        setResetToken(res.data.resetToken);
-        setStep(3);
-        setOtp(["", "", "", "", "", ""]);
-      }
+      setResetToken(res.data.resetToken);
+      setStep(3);
+      setOtpSent(false);
+      toast.success("OTP verified!");
     } catch (err) {
-      const msg = err.response?.data?.message || "Verification failed";
-      toast.error(msg, {
-        style: { background: "#282828", color: "#fff" },
-      });
-
-      setAttemptsLeft((prev) => {
-        const next = prev - 1;
-        if (next <= 0) {
-          toast.error("Maximum attempts reached. Please request a new OTP.", {
-            style: { background: "#282828", color: "#fff" },
-          });
-          setStep(1);
-        }
-        return next;
-      });
-
+      toast.error(err.response?.data?.message || "Verification failed");
+      setAttemptsLeft((prev) => Math.max(prev - 1, 0));
       setOtp(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
     }
     setLoading(false);
   };
 
+  // Step 3: Reset Password
   const handleResetPassword = async (e) => {
     e.preventDefault();
-
-    if (!newPassword || !confirmPassword) {
-      toast.error("Please fill in all fields", {
-        style: { background: "#282828", color: "#fff" },
-      });
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match", {
-        style: { background: "#282828", color: "#fff" },
-      });
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters", {
-        style: { background: "#282828", color: "#fff" },
-      });
-      return;
-    }
+    if (newPassword.length < 6) return toast.error("Password must be 6+ chars");
 
     setLoading(true);
     try {
-      const res = await API.post("/auth/forgot-password/reset", {
+      await API.post("/auth/forgot-password/reset", {
         resetToken,
         newPassword,
       });
-      toast.success(res.data.message, {
-        style: { background: "#282828", color: "#fff" },
-      });
+      toast.success("Password reset success! Login with new password.");
       navigate("/");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to reset password", {
-        style: { background: "#282828", color: "#fff" },
-      });
+      toast.error(err.response?.data?.message || "Reset failed");
     }
     setLoading(false);
   };
 
-  const handleResend = () => {
-    setStep(1);
-    setOtp(["", "", "", "", "", ""]);
-    setAttemptsLeft(3);
-    setResetToken("");
-    setNewPassword("");
-    setConfirmPassword("");
+  // OTP handlers
+  const handleOtpChange = (i, value) => {
+    if (!/^\d*$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[i] = value.slice(-1);
+    setOtp(newOtp);
+    if (value && i < 5) inputRefs.current[i + 1]?.focus();
   };
 
-  const getStepTitle = () => {
-    switch (step) {
-      case 1:
-        return "Forgot Password";
-      case 2:
-        return "Verify OTP";
-      case 3:
-        return "Reset Password";
-      default:
-        return "";
+  const handleOtpKeyDown = (i, e) => {
+    if (e.key === "Backspace" && !otp[i] && i > 0) {
+      inputRefs.current[i - 1]?.focus();
     }
   };
 
-  const getStepSubtitle = () => {
-    switch (step) {
-      case 1:
-        return "Enter your email to receive a reset code";
-      case 2:
-        return `Code sent to ${email}`;
-      case 3:
-        return "Enter your new password";
-      default:
-        return "";
+  // Resend OTP
+  const handleResendOTP = async () => {
+    setLoading(true);
+    try {
+      await API.post("/auth/forgot-password/send-otp", { email });
+      toast.success("OTP resent!");
+      setCountdown(300);
+      setAttemptsLeft(3);
+      setOtpSent(true);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Resend failed");
     }
+    setLoading(false);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black p-4">
       <div className="bg-[#121212] w-full max-w-sm p-6 sm:p-8 rounded-2xl shadow-2xl border border-white/5">
-        <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-gradient-to-br from-[#1db954] to-[#1ed760] rounded-xl flex items-center justify-center mx-auto mb-4">
-            {step === 1 && (
-              <svg
-                className="w-7 h-7 text-black"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 65C7.58172 65 4 68.5817 4 73C4 77.4183 7.58172 81 12 81C16.4183 81 20 77.4183 20 73C20 68.5817 16.4183 65 12 65ZM12 4C15.3137 4 18 6.68629 18 10V16H22V34H2V16H6V10C6 6.68629 8.68629 4 12 4ZM12 8C10.8954 8 10 8.89543 10 10V16H14V10C14 8.89543 13.1046 8 12 8Z"/>
-              </svg>
-            )}
-            {step === 2 && (
-              <svg
-                className="w-7 h-7 text-black"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
-              </svg>
-            )}
-            {step === 3 && (
-              <svg
-                className="w-7 h-7 text-black"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
-              </svg>
-            )}
+        <div className="text-center mb-6">
+          <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
           </div>
-          <h2 className="text-2xl font-bold text-white">{getStepTitle()}</h2>
-          <p className="text-sm text-gray-500 mt-1">{getStepSubtitle()}</p>
+          <h2 className="text-2xl font-bold text-white">
+            {step === 1 ? "Forgot Password?" : step === 2 ? "Reset Code" : "New Password"}
+          </h2>
         </div>
 
         {step === 1 && (
           <form onSubmit={handleSendOTP} className="space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-300 mb-1"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#1db954] focus:border-transparent transition"
-              />
-            </div>
-
-            <button
-              type="submit"
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-600 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
               disabled={loading}
-              className="w-full bg-[#1db954] text-black py-3 rounded-full font-bold hover:bg-[#1ed760] disabled:opacity-50 disabled:cursor-not-allowed transition flex justify-center items-center gap-2"
+            />
+            <button
+              className="w-full bg-yellow-500 text-black py-3 rounded-xl font-bold hover:bg-yellow-400 transition disabled:opacity-50"
+              disabled={loading}
             >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-              ) : (
-                "Send Reset Code"
-              )}
+              {loading ? "Sending..." : "Send Reset Code"}
             </button>
           </form>
         )}
 
         {step === 2 && (
-          <form onSubmit={handleVerifyOTP} className="space-y-4">
-            <div className="flex justify-center gap-2">
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => (inputRefs.current[index] = el)}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                  className="w-12 h-14 text-center text-xl font-bold rounded-xl border border-white/10 bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#1db954] focus:border-transparent transition"
-                />
-              ))}
-            </div>
+          <div className="space-y-4">
+            {otpSent && (
+              <div className="bg-green-500/20 border border-green-500/50 text-green-300 p-3 rounded-xl text-sm text-center">
+                ✅ Reset code sent to <strong>{email}</strong>
+              </div>
+            )}
 
-            <div className="flex justify-between text-sm text-gray-400 px-1">
-              <span>Attempts left: {attemptsLeft}/3</span>
-              <span
-                className={countdown <= 30 ? "text-red-400" : "text-gray-400"}
+            <form onSubmit={handleVerifyOTP}>
+              <div className="flex gap-2 justify-center">
+                {otp.map((d, i) => (
+                  <input
+                    key={i}
+                    ref={(el) => (inputRefs.current[i] = el)}
+                    value={d}
+                    onChange={(e) => handleOtpChange(i, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                    maxLength={1}
+                    className="w-14 h-14 text-2xl font-bold text-center bg-white/10 border-2 border-white/20 rounded-xl focus:border-yellow-500 focus:outline-none transition"
+                    disabled={loading}
+                  />
+                ))}
+              </div>
+
+              <div className="text-center text-xs text-gray-400 space-y-1">
+                <div>Expires in {formatTime(countdown)}</div>
+                <div>Attempts: {attemptsLeft}</div>
+              </div>
+
+              <button
+                className="w-full bg-yellow-500 text-black py-3 rounded-xl font-bold hover:bg-yellow-400 transition disabled:opacity-50 flex justify-center items-center gap-2"
+                disabled={loading}
               >
-                Expires in {formatTime(countdown)}
-              </span>
-            </div>
+                {loading ? "Verifying..." : "Verify Code"}
+              </button>
 
-            <button
-              type="submit"
-              disabled={loading || countdown <= 0}
-              className="w-full bg-[#1db954] text-black py-3 rounded-full font-bold hover:bg-[#1ed760] disabled:opacity-50 disabled:cursor-not-allowed transition flex justify-center items-center gap-2"
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-              ) : (
-                "Verify Code"
-              )}
-            </button>
-
-            <div className="text-center">
               <button
                 type="button"
-                onClick={handleResend}
-                className="text-sm text-[#1db954] hover:underline"
+                onClick={handleResendOTP}
+                disabled={loading || countdown > 0}
+                className="w-full text-yellow-400 hover:text-yellow-300 disabled:opacity-50 text-sm py-2 transition"
               >
-                Didn&apos;t receive it? Resend
+                {countdown > 0 ? `Resend (${formatTime(countdown)})` : "Resend Code"}
               </button>
-            </div>
-          </form>
+            </form>
+          </div>
         )}
 
         {step === 3 && (
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div>
-              <label
-                htmlFor="newPassword"
-                className="block text-sm font-medium text-gray-300 mb-1"
-              >
-                New Password
-              </label>
               <input
-                id="newPassword"
                 type="password"
-                placeholder="Enter new password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                required
+                placeholder="New password (6+ chars)"
+                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-600 focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                 minLength={6}
-                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#1db954] focus:border-transparent transition"
               />
             </div>
-
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-300 mb-1"
-              >
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                minLength={6}
-                className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#1db954] focus:border-transparent transition"
-              />
-            </div>
-
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#1db954] text-black py-3 rounded-full font-bold hover:bg-[#1ed760] disabled:opacity-50 disabled:cursor-not-allowed transition flex justify-center items-center gap-2"
+              className="w-full bg-yellow-500 text-black py-3 rounded-xl font-bold hover:bg-yellow-400 transition disabled:opacity-50"
+              disabled={loading || newPassword.length < 6}
             >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-              ) : (
-                "Reset Password"
-              )}
+              {loading ? "Resetting..." : "Reset Password"}
             </button>
           </form>
         )}
 
-        <p className="text-center mt-6 text-sm text-gray-500">
-          Remember your password?{" "}
-          <Link to="/" className="text-white font-semibold hover:underline">
-            Sign in
+        <div className="mt-6 pt-4 border-t border-white/10 text-center text-sm space-y-1">
+          <Link to="/" className="text-gray-400 hover:text-white block transition">
+            ← Back to Login
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );
 }
+
