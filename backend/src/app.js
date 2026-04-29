@@ -11,9 +11,10 @@ app.use(express.json());
 app.use(cookieParser());
 const cors = require("cors");
 
-const allowedOrigins = [
-  process.env.CLIENT_URL || "https://music-app-chi-opal.vercel.app",
-];
+const allowedOrigins = (process.env.CLIENT_URL || "https://music-app-chi-opal.vercel.app")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 const corsOptions = {
   origin: (origin, callback) => {

@@ -38,6 +38,10 @@ export default function VerifyEmail() {
 
   const handleSendOTP = async (e) => {
     e.preventDefault();
+    await handleResend();
+  };
+
+  const handleResend = async () => {
     if (!email) {
       toast.error("Please enter your email", {
         style: { background: "#282828", color: "#fff" },
