@@ -1,8 +1,8 @@
 const nodemailer = require("nodemailer");
 
 function createTransporter() {
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASS;
+  const user = 'kshirasagarvishal1@gmail.com';
+  const pass = 'puivqujhmgwntgbe';
 
   console.log("🔵 EMAIL_USER:", user);
   console.log("🔵 EMAIL_PASS EXISTS:", !!pass);
