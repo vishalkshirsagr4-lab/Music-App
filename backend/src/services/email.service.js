@@ -4,8 +4,8 @@ function createTransporter() {
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
+      user: 'vishalkshirsagr4@gmail.com',
+      pass: 'gwmd jwqu yeso skhb'
     }
   });
 }
@@ -14,7 +14,7 @@ async function sendOTPEmail(to, otp) {
   const transporter = createTransporter();
 
   const mailOptions = {
-    from: `"Music App" <${process.env.EMAIL_USER}>`,
+    from: `"Music App vishalkshirsagr4@gmail.com" <vishalkshirsagr4@gmail.com>`,
     to,
     subject: 'Your Email Verification Code',
     html: `
@@ -34,7 +34,7 @@ async function sendPasswordResetOTPEmail(to, otp) {
   const transporter = createTransporter();
 
   const mailOptions = {
-    from: `"Music App" <${process.env.EMAIL_USER}>`,
+    from: `"Music App vishalkshirsagr4@gmail.com" <vishalkshirsagr4@gmail.com>`,
     to,
     subject: 'Password Reset Code',
     html: `
