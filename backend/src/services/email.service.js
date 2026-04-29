@@ -5,7 +5,7 @@ function createTransporter() {
     service: 'gmail',
     auth: {
       user: 'vishalkshirsagr4@gmail.com',
-      pass: 'gwmd jwqu yeso skhb'
+      pass: 'gwmdjwquyesoskhb'
     }
   });
 }
@@ -27,7 +27,14 @@ async function sendOTPEmail(to, otp) {
     `,
   };
 
-  return await transporter.sendMail(mailOptions);
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent:", info.messageId);
+    return info;
+  } catch (err) {
+    console.error("❌ Email error:", err);
+    throw err;
+  }
 }
 
 async function sendPasswordResetOTPEmail(to, otp) {
@@ -47,7 +54,14 @@ async function sendPasswordResetOTPEmail(to, otp) {
     `,
   };
 
-  return await transporter.sendMail(mailOptions);
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent:", info.messageId);
+    return info;
+  } catch (err) {
+    console.error("❌ Email error:", err);
+    throw err;
+  }
 }
 
 module.exports = { sendOTPEmail, sendPasswordResetOTPEmail };
