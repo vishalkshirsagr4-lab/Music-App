@@ -4,14 +4,14 @@ require('dotenv').config();
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: 'vishalkshirsagr4@gmail.com',
+    pass: 'kmpw hykv ewsl tksr',
   },
 });
 
 async function sendOTPEmail(to, otp) {
   const mailOptions = {
-    from: `"Music App" <${process.env.EMAIL_USER}>`,
+    from: `"Music App" <vishalkshirsagr4@gmail.com>`,
     to,
     subject: 'Your Email Verification Code',
     html: `
@@ -31,7 +31,7 @@ async function sendOTPEmail(to, otp) {
 
 async function sendPasswordResetOTPEmail(to, otp) {
   const mailOptions = {
-    from: `"Music App" <${process.env.EMAIL_USER}>`,
+    from: `"Music App" <vishalkshirsagr4@gmail.com>`,
     to,
     subject: 'Password Reset Request',
     html: `
