@@ -36,5 +36,6 @@ app.use('/api/music', musicRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/sections', sectionRoutes);
+app.use('/api/test', require('./routes/test.routes'));
 
 module.exports = app;

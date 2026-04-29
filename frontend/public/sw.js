@@ -1,4 +1,4 @@
-const CACHE_NAME = 'music-app-v2'; // Updated version
+const CACHE_NAME = 'music-app-v3'; // Bump for Vercel
 const STATIC_ASSETS = [
   '/',
   '/index.html',

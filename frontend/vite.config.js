@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/', // Fix PWA refresh 404
+  base: './', // Vercel SPA paths
   preview: {
     port: 4173,
     strictPort: true,

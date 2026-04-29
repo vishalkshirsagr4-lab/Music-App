@@ -2,7 +2,8 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: "https://music-app-0r90.onrender.com/api",
-  withCredentials: true, // 🔥 VERY IMPORTANT
+  withCredentials: true,
+  timeout: 10000, // 10s timeout for email hangs
 });
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
