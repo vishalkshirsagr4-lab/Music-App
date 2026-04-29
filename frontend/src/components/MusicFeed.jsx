@@ -58,7 +58,7 @@ export default function MusicFeed({ sections, loading }) {
 
         return (
           <section key={section._id} className="bg-[#181818]/50 rounded-2xl p-5 sm:p-6 border border-white/5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-5 gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-5 gap-3">
               <div>
                 <h2 className="text-xl font-bold text-white">{section.title}</h2>
                 <button

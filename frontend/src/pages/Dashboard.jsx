@@ -55,17 +55,17 @@ export default function Dashboard() {
         {/* HERO SECTION */}
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-[#2a2a2a] to-transparent opacity-50" />
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-3">
+          <div className="relative max-w-full sm:max-w-4xl md:max-w-6xl lg:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 leading-tight">
               Discover Music
             </h1>
-            <p className="text-gray-400 text-lg max-w-xl">
+            <p className="text-gray-400 text-base sm:text-lg max-w-md sm:max-w-xl">
               Explore songs and albums created by talented artists around the world
             </p>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+        <div className="max-w-full sm:max-w-4xl md:max-w-6xl lg:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
           {/* QUICK PICKS */}
           {!loading && musics.length > 0 && <QuickPicks musics={musics} />}
 

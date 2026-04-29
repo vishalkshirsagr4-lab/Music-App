@@ -1,46 +1,37 @@
-# Forgot Password Feature Implementation
+# Responsive Frontend Plan Progress
 
-## Backend Tasks
-- [x] 1. Update `backend/src/models/otp.model.js` — add `type` field
-- [x] 2. Update `backend/src/services/email.service.js` — add `sendPasswordResetOTPEmail()`
-- [x] 3. Update `backend/src/controllers/auth.controller.js` — add forgot password controllers
-- [x] 4. Update `backend/src/routes/auth.routes.js` — add forgot password routes
+## Approved Plan Steps:
 
-## Frontend Tasks
-- [x] 5. Create `frontend/src/pages/ForgotPassword.jsx`
-- [x] 6. Update `frontend/src/App.jsx` — add `/forgot-password` route
-- [x] 7. Update `frontend/src/pages/Login.jsx` — add "Forgot Password?" link
+### 1. **Create/Update TODO.md** ✅ 
 
-## Implementation Summary
+### 2. Global improvements
+- [x] Edit `frontend/src/index.css` (mobile scrollbars/audio) ✅
+- [x] Check/add viewport meta in `frontend/index.html` ✅
 
-### Backend Changes
-1. **OTP Model** — Added `type` field (`email_verification` | `password_reset`) with index to prevent OTP conflicts between features.
-2. **Email Service** — Added `sendPasswordResetOTPEmail()` with a password-reset themed HTML email template.
-3. **Auth Controller** — Added 3 new functions:
-   - `sendForgotPasswordOTP` — Sends a 6-digit OTP to user's email for password reset
-   - `verifyForgotPasswordOTP` — Verifies the OTP and returns a short-lived JWT `resetToken` (10 min expiry)
-   - `resetPassword` — Validates `resetToken` and updates the user's password with bcrypt hashing
-   - Also updated existing `sendOTP` and `verifyOTP` to use `type: 'email_verification'` for consistency
-4. **Auth Routes** — Added 3 new public routes:
-   - `POST /auth/forgot-password/send-otp`
-   - `POST /auth/forgot-password/verify-otp`
-   - `POST /auth/forgot-password/reset`
+### 3. Core Layout & Navigation
+- [x] Edit `frontend/src/components/Layout.jsx` ✅
+- [x] Edit `frontend/src/components/Navbar.jsx` ✅
+- [ ] Edit `frontend/src/App.jsx` (if needed)
 
-### Frontend Changes
-5. **ForgotPassword.jsx** — New 3-step wizard page (Email → OTP → New Password) with:
-   - Consistent dark theme matching Login/VerifyEmail pages
-   - 6-digit OTP inputs with auto-focus
-   - Countdown timer (5 min) and attempt tracker (3 max)
-   - Password confirmation validation
-   - Redirects to login after successful reset
-6. **App.jsx** — Added `/forgot-password` route
-7. **Login.jsx** — Added "Forgot Password?" link below the Sign In button
+### 4. Key Components
+- [x] `frontend/src/components/MusicFeed.jsx` ✅
+- [ ] `frontend/src/components/MusicCard.jsx`
+- [ ] `frontend/src/components/AlbumCard.jsx`
+- [x] `frontend/src/components/InstallBanner.jsx` ✅
+- [x] `frontend/src/components/SearchBar.jsx` ✅
 
-### Security Features
-- OTPs are hashed with bcrypt before storage
-- OTPs expire after 5 minutes (MongoDB TTL index)
-- Maximum 3 verification attempts per OTP
-- Reset token is a short-lived JWT (10 minutes)
-- Password minimum length of 6 characters enforced on both frontend and backend
-- Email verification and password reset OTPs are isolated via the `type` field
+### 5. High-Impact Pages
+- [x] `frontend/src/pages/Dashboard.jsx` ✅
+- [x] `frontend/src/pages/SearchPage.jsx` ✅
+- [x] `frontend/src/pages/UploadMusic.jsx` ✅
+- [x] `frontend/src/pages/ArtistDashboard.jsx` ✅
+- [ ] `frontend/src/pages/SectionPage.jsx`
+- [ ] `frontend/src/pages/RecentPage.jsx` (table to cards)
+- [ ] `frontend/src/pages/Profile.jsx`
+
+### 6. Testing & Completion
+- [ ] Test: `cd frontend && npm run dev`
+- [ ] Final review & attempt_completion
+
+**Next step: Read MusicCard.jsx, AlbumCard.jsx, SectionPage.jsx, RecentPage.jsx, Profile.jsx for responsive edits.**
 

@@ -404,7 +404,7 @@ export default function ArtistDashboard() {
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-b from-[#1a1a1a] via-black to-black text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="max-w-full sm:max-w-4xl md:max-w-6xl lg:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">

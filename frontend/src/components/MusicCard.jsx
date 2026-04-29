@@ -49,8 +49,8 @@ export default function MusicCard({ music }) {
 
         {/* PLAY BUTTON (hover effect) */}
         <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-          <div className="w-12 h-12 bg-[#1db954] rounded-full flex items-center justify-center shadow-xl hover:scale-105 transition">
-            <svg className="w-6 h-6 text-black ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+          <div className="w-11 sm:w-12 h-11 sm:h-12 bg-[#1db954] rounded-full flex items-center justify-center shadow-xl hover:scale-105 transition">
+            <svg className="w-5 sm:w-6 h-5 sm:h-6 text-black ml-0.5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>

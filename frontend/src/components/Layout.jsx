@@ -20,7 +20,7 @@ export default function Layout({ children }) {
         <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
         {/* Page content */}
-        <main className="pt-16">
+        <main className="pt-14 sm:pt-16">
           {children}
         </main>
       </div>

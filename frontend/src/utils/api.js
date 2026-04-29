@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: "https://music-app-0r90.onrender.com/api",
   withCredentials: true, // 🔥 VERY IMPORTANT
 });
 API.interceptors.request.use((config) => {

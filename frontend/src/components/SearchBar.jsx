@@ -60,7 +60,7 @@ export default function SearchBar() {
   };
 
   return (
-    <div ref={containerRef} className="relative flex-1 max-w-md">
+    <div ref={containerRef} className="relative flex-1 max-w-xs sm:max-w-md">
       <form onSubmit={handleSubmit} className="relative">
         <svg
           className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"

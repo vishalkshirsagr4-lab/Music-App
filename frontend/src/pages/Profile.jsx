@@ -72,12 +72,12 @@ export default function Profile() {
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-b from-[#1a1a1a] via-black to-black text-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
-          <div className="bg-[#181818] border border-white/10 rounded-3xl p-8 shadow-2xl">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="max-w-lg sm:max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <div className="bg-[#181818] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
               <div>
-                <h1 className="text-3xl font-bold text-white">Profile</h1>
-                <p className="text-gray-400 mt-2">Update your username and profile image.</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">Profile</h1>
+                <p className="text-gray-400 mt-2 text-sm sm:text-base">Update your username and profile image.</p>
               </div>
               <div className="flex items-center gap-3">
                 <img

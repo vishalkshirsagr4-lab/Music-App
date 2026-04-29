@@ -91,7 +91,7 @@ export default function InstallBanner() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-[#1db954] to-[#1ed760] text-black shadow-lg animate-slideDown">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+      <div className="max-w-full sm:max-w-4xl md:max-w-6xl lg:max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3 sm:gap-4">
         
         {/* Left */}
         <div className="flex items-center gap-3 min-w-0">

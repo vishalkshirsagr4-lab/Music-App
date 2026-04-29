@@ -47,7 +47,7 @@ export default function SearchPage() {
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-b from-[#1a1a1a] via-black to-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="max-w-full sm:max-w-4xl md:max-w-6xl lg:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <h1 className="text-2xl font-bold text-white mb-6">
             Search results for &quot;{q}&quot;
           </h1>

@@ -22,7 +22,7 @@ export default function Navbar({ onMenuClick }) {
 
   return (
     <nav className="fixed top-0 right-0 left-0 md:left-64 z-40 bg-black/80 backdrop-blur-xl border-b border-white/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="max-w-full sm:max-w-4xl md:max-w-6xl lg:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left: Mobile menu + Search */}
           <div className="flex items-center gap-3 flex-1">
