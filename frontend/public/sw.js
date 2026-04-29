@@ -1,4 +1,4 @@
-const CACHE_NAME = 'music-app-v1';
+const CACHE_NAME = 'music-app-v2'; // Updated version
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -9,107 +9,61 @@ const STATIC_ASSETS = [
   '/favicon.svg'
 ];
 
-// Install event - cache static assets
+// Install
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(STATIC_ASSETS);
-      })
+      .then((cache) => cache.addAll(STATIC_ASSETS))
       .then(() => self.skipWaiting())
   );
 });
 
-// Activate event - clean up old caches
+// Activate
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME)
+    caches.keys().then((cacheNames) => 
+      Promise.all(
+        cacheNames.filter((name) => name !== CACHE_NAME)
           .map((name) => caches.delete(name))
-      );
-    }).then(() => self.clients.claim())
+      )
+    ).then(() => self.clients.claim())
   );
 });
 
-// Fetch event - caching strategy
+// Fetch - Enhanced SPA support
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  const url = new URL(request.url);
+  
+  if (request.method !== 'GET') return;
+  if (new URL(request.url).origin !== self.location.origin) return;
 
-  // Skip non-GET requests
-  if (request.method !== 'GET') {
-    return;
-  }
-
-  // Skip cross-origin requests
-  if (url.origin !== self.location.origin) {
-    return;
-  }
-
-  // API calls - Network First with cache fallback
-  if (url.pathname.startsWith('/api/')) {
+  // API - Network First
+  if (request.url.includes('/api/')) {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          if (response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          return caches.match(request).then((cachedResponse) => {
-            if (cachedResponse) {
-              return cachedResponse;
-            }
-            return new Response(JSON.stringify({ error: 'Offline' }), {
-              status: 503,
-              headers: { 'Content-Type': 'application/json' }
-            });
-          });
-        })
+      fetch(request).then((resp) => {
+        if (resp.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, resp.clone()));
+        return resp;
+      }).catch(() => caches.match(request) || Response.error())
     );
     return;
   }
 
-  // Static assets - Cache First with network fallback
-  event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Return cached version and update cache in background
-        fetch(request)
-          .then((response) => {
-            if (response.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(request, response);
-              });
-            }
-          })
-          .catch(() => {});
-        return cachedResponse;
-      }
+  // SPA Routes - index.html fallback (FIX 404 REFRESH)
+  if (request.mode === 'navigate' || request.destination === 'document') {
+    event.respondWith(
+      fetch(request).catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
 
-      return fetch(request)
-        .then((response) => {
-          if (response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          // If it's a navigation request, return offline page
-          if (request.mode === 'navigate') {
-            return caches.match('/offline.html');
-          }
-          return new Response('Offline', { status: 503 });
-        });
-    })
+  // Static - Cache First
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+      return fetch(request).then((resp) => {
+        if (resp.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, resp.clone()));
+        return resp;
+      });
+    }).catch(() => caches.match('/offline.html'))
   );
 });

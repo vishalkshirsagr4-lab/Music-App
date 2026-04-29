@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -10,6 +9,8 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendOTPEmail(to, otp) {
+  console.log('🚀 Sending OTP email to:', to);
+  
   const mailOptions = {
     from: `"Music App" <vishalkshirsagr4@gmail.com>`,
     to,
@@ -26,10 +27,20 @@ async function sendOTPEmail(to, otp) {
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    console.log('📤 Sending mail...');
+    const result = await transporter.sendMail(mailOptions);
+    console.log('✅ Email sent:', result.messageId);
+    return result;
+  } catch (error) {
+    console.error('❌ Email failed:', error.message);
+    throw error;
+  }
 }
 
 async function sendPasswordResetOTPEmail(to, otp) {
+  console.log('🔄 Sending reset email to:', to);
+  
   const mailOptions = {
     from: `"Music App" <vishalkshirsagr4@gmail.com>`,
     to,
@@ -46,8 +57,14 @@ async function sendPasswordResetOTPEmail(to, otp) {
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    const result = await transporter.sendMail(mailOptions);
+    console.log('✅ Reset email sent:', result.messageId);
+    return result;
+  } catch (error) {
+    console.error('❌ Reset email failed:', error.message);
+    throw error;
+  }
 }
 
 module.exports = { sendOTPEmail, sendPasswordResetOTPEmail };
-

@@ -1,37 +1,16 @@
-# Responsive Frontend Plan Progress
+# Music App Fixes - OTP & PWA 404
 
-## Approved Plan Steps:
+## Step 1: Fix OTP Email **LOGGING READY**
+- [x] Files updated with detailed console.log (manual check needed)
+- [x] backend/.env created  
+- [ ] **USER ACTION:** Restart backend → test send OTP → paste console logs here
+- [ ] Fix based on logs (Gmail/DB)
 
-### 1. **Create/Update TODO.md** ✅ 
+## Step 2: PWA 404 Fix (Pending OTP)
+- [ ] vite.config.js base:'/'
+- [ ] sw.js SPA fallback  
+- [ ] Test preview refresh
 
-### 2. Global improvements
-- [x] Edit `frontend/src/index.css` (mobile scrollbars/audio) ✅
-- [x] Check/add viewport meta in `frontend/index.html` ✅
+## Full Test & Deploy (After fixes)
 
-### 3. Core Layout & Navigation
-- [x] Edit `frontend/src/components/Layout.jsx` ✅
-- [x] Edit `frontend/src/components/Navbar.jsx` ✅
-- [ ] Edit `frontend/src/App.jsx` (if needed)
-
-### 4. Key Components
-- [x] `frontend/src/components/MusicFeed.jsx` ✅
-- [ ] `frontend/src/components/MusicCard.jsx`
-- [ ] `frontend/src/components/AlbumCard.jsx`
-- [x] `frontend/src/components/InstallBanner.jsx` ✅
-- [x] `frontend/src/components/SearchBar.jsx` ✅
-
-### 5. High-Impact Pages
-- [x] `frontend/src/pages/Dashboard.jsx` ✅
-- [x] `frontend/src/pages/SearchPage.jsx` ✅
-- [x] `frontend/src/pages/UploadMusic.jsx` ✅
-- [x] `frontend/src/pages/ArtistDashboard.jsx` ✅
-- [ ] `frontend/src/pages/SectionPage.jsx`
-- [ ] `frontend/src/pages/RecentPage.jsx` (table to cards)
-- [ ] `frontend/src/pages/Profile.jsx`
-
-### 6. Testing & Completion
-- [ ] Test: `cd frontend && npm run dev`
-- [ ] Final review & attempt_completion
-
-**Next step: Read MusicCard.jsx, AlbumCard.jsx, SectionPage.jsx, RecentPage.jsx, Profile.jsx for responsive edits.**
-
+**Next:** Test + paste backend logs!
