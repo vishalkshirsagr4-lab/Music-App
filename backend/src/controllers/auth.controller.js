@@ -191,7 +191,13 @@ async function sendOTP(req, res) {
         });
 
         // Send OTP via email
-        await sendOTPEmail(email, otp);
+        try {
+          await sendOTPEmail(email, otp);
+        } catch (emailErr) {
+          console.error('Email send failed:', emailErr);
+          await otpModel.deleteOne({ email, type: 'email_verification' }); // cleanup
+          return res.status(500).json({ message: 'Email service failed. Check server logs for details.' });
+        }
 
         res.status(200).json({ message: "OTP sent successfully" });
     } catch (err) {
@@ -386,7 +392,13 @@ async function sendForgotPasswordOTP(req, res) {
         });
 
         // Send OTP via email
-        await sendPasswordResetOTPEmail(email, otp);
+        try {
+          await sendPasswordResetOTPEmail(email, otp);
+        } catch (emailErr) {
+          console.error('Password reset email failed:', emailErr);
+          await otpModel.deleteOne({ email, type: 'password_reset' });
+          return res.status(500).json({ message: 'Email service failed. Check server logs.' });
+        }
 
         res.status(200).json({ message: "OTP sent successfully" });
     } catch (err) {

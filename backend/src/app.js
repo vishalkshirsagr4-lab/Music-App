@@ -5,6 +5,7 @@ const musicRoutes = require('./routes/music.routes');
 const uploadRoutes = require('./routes/upload.routes');
 const adminRoutes = require('./routes/admin.routes');
 const sectionRoutes = require('./routes/section.routes');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
@@ -37,5 +38,13 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/sections', sectionRoutes);
 app.use('/api/test', require('./routes/test.routes'));
+
+// Serve frontend build (Vite)
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Handle React Router routes - must be last
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
 
 module.exports = app;

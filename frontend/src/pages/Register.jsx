@@ -42,7 +42,7 @@ export default function Register() {
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
-      toast.success(res.data.message, {
+      toast.success(`${res.data.message}. Check your email for verification code!`, {
         style: { background: "#282828", color: "#fff" },
       });
       navigate("/verify-email?email=" + encodeURIComponent(form.email));
