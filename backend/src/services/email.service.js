@@ -3,22 +3,27 @@ const nodemailer = require("nodemailer");
 function createTransporter() {
   const user = process.env.EMAIL_USER;
   const pass = process.env.EMAIL_PASS;
+  
+  if (!user || !pass) {
+    throw new Error('Missing EMAIL_USER or EMAIL_PASS');
+  }
 
-  console.log("🔵 SMTP Config loaded");
+  console.log("🔵 SMTP Gmail ready for:", user);
 
   return nodemailer.createTransporter({
     host: 'smtp.gmail.com',
     port: 587,
-    secure: false, // true for 465, false for other
+    secure: false,
     auth: {
       user,
       pass
     },
-    connectionTimeout: 10000,
-    socketTimeout: 10000,
-    pool: true,
-    maxConnections: 1,
-    maxMessages: 5
+    tls: {
+      rejectUnauthorized: false
+    },
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000
   });
 }
 
