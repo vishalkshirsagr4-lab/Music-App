@@ -1,37 +1,21 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const app = require('./src/app');
-const connectDB = require('./src/db/db');
-const seedAdmin = require('./src/utils/seedAdmin');
+const app = require("./src/app");
+const connectDB = require("./src/db/db");
 
-// Validate env vars
-const requiredEnv = ['MONGO_URI', 'JWT_SECRET'];
-
-for (const key of requiredEnv) {
-  if (!process.env[key]) {
-    console.error(`❌ Missing env var: ${key}`);
-    process.exit(1);
-  }
-}
-
-console.log('✅ Env vars loaded');
+const PORT = process.env.PORT || 5000;
 
 async function startServer() {
   try {
     await connectDB();
-    console.log('✅ DB connected');
+    console.log("✅ MongoDB Connected");
 
-    await seedAdmin();
-    console.log('✅ Seeded admin');
-
-    const port = process.env.PORT || 5000;
-
-    app.listen(port, () => {
-      console.log(`🚀 Server running on port ${port}`);
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
     });
 
-  } catch (err) {
-    console.error('💥 Startup failed:', err);
+  } catch (error) {
+    console.error("❌ Server startup failed:", error);
     process.exit(1);
   }
 }
