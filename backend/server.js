@@ -1,22 +1,35 @@
-require('dotenv').config();
+require('dotenv').config({ path: '.env' });
 const app = require('./src/app');
 const connectDB = require('./src/db/db');
 const seedAdmin = require('./src/utils/seedAdmin');
-const dns = require('dns');
-dns.setServers(['8.8.8.8', '8.8.4.4']);
+
+// Validate env vars
+const requiredEnv = ['MONGO_URI', 'JWT_SECRET'];
+for (const key of requiredEnv) {
+  if (!process.env[key]) {
+    console.error(`❌ Missing env var: ${key}`);
+    process.exit(1);
+  }
+}
+
+console.log('✅ Env vars loaded:', requiredEnv.length);
 
 async function startServer() {
   try {
     await connectDB();
+    console.log('✅ DB connected');
     await seedAdmin();
+    console.log('✅ Seeded admin');
 
-    app.listen(process.env.PORT || 3000, () => {
-      console.log('Server is running on port ' + (process.env.PORT || 3000));
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`🚀 Server running on port ${port}`);
     });
   } catch (err) {
-    console.error('Server startup failed:', err);
+    console.error('💥 Startup failed:', err.message);
     process.exit(1);
   }
 }
 
 startServer();
+

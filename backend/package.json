@@ -1,12 +1,16 @@
 {
   "name": "complete-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Music app backend",
+  "main": "server.js",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "npm ci"
   },
   "keywords": [],
   "author": "",
@@ -21,8 +25,9 @@
     "dotenv": "^17.4.2",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.3",
-    "multer": "^2.0.2"
+    "mongoose": "7.6.3",
+    "multer": "^2.0.2",
+    "nodemailer": "6.9.15"
 
   },
   "devDependencies": {
