@@ -190,14 +190,13 @@ async function sendOTP(req, res) {
             type: 'email_verification',
         });
 
-        // Send OTP via email
-        try {
-          await sendOTPEmail(email, otp);
-        } catch (emailErr) {
-          console.error('Email send failed:', emailErr);
-          await otpModel.deleteOne({ email, type: 'email_verification' }); // cleanup
-          return res.status(500).json({ message: 'Email service failed. Check server logs for details.' });
-        }
+        // Store OTP first (always available for verify)
+        // Send OTP via email (non-blocking)
+        sendOTPEmail(email, otp).then(() => {
+          console.log('✅ Email sent successfully');
+        }).catch((emailErr) => {
+          console.error('⚠️ Email failed but OTP stored:', emailErr.message);
+        });
 
         res.status(200).json({ message: "OTP sent successfully" });
     } catch (err) {
@@ -391,14 +390,12 @@ async function sendForgotPasswordOTP(req, res) {
             type: 'password_reset',
         });
 
-        // Send OTP via email
-        try {
-          await sendPasswordResetOTPEmail(email, otp);
-        } catch (emailErr) {
-          console.error('Password reset email failed:', emailErr);
-          await otpModel.deleteOne({ email, type: 'password_reset' });
-          return res.status(500).json({ message: 'Email service failed. Check server logs.' });
-        }
+        // Send OTP via email (non-blocking)
+        sendPasswordResetOTPEmail(email, otp).then(() => {
+          console.log('✅ Password reset email sent');
+        }).catch((emailErr) => {
+          console.error('⚠️ Password reset email failed but OTP stored:', emailErr.message);
+        });
 
         res.status(200).json({ message: "OTP sent successfully" });
     } catch (err) {
