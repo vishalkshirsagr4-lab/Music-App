@@ -1,8 +1,8 @@
 const nodemailer = require("nodemailer");
 
 function createTransporter() {
-  const user = process.env.EMAIL_USER || 'kshirasagarvishal1@gmail.com';
-  const pass = process.env.EMAIL_PASS || 'puiv qujh mgwn tgbe';
+  const user = process.env.EMAIL_USER;
+  const pass = process.env.EMAIL_PASS;
 
   console.log("🔵 SMTP Config loaded");
 
