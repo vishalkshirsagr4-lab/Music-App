@@ -1,7 +1,11 @@
 const tls = require('tls');
 const { promisify } = require('util');
 
+<<<<<<< HEAD
 function createSMTPConnection() {
+=======
+function createTransporter() {
+>>>>>>> a713bd5 (fixed)
   const user = 'kshirasagarvishal1@gmail.com';
   const pass = 'puiv qujh mgwn tgbe';
 
@@ -12,6 +16,7 @@ function createSMTPConnection() {
     throw new Error("EMAIL env missing in Render");
   }
 
+<<<<<<< HEAD
   return new Promise((resolve, reject) => {
     const socket = tls.connect({
       host: 'smtp.gmail.com',
@@ -23,6 +28,23 @@ function createSMTPConnection() {
     });
 
     socket.on('error', reject);
+=======
+  return nodemailer.createTransporter({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // true for 465, false for other ports
+    auth: { 
+      user, 
+      pass 
+    },
+    pool: true,
+    maxConnections: 1,
+    maxMessages: 5,
+    connectionTimeout: 10000,
+    socketTimeout: 10000,
+    logger: true,
+    debug: true
+>>>>>>> a713bd5 (fixed)
   });
 }
 
@@ -131,8 +153,22 @@ async function sendEmailViaSMTP(to, subject, text) {
 async function sendOTPEmail(to, otp) {
   console.log("🚀 OTP EMAIL START");
   try {
+<<<<<<< HEAD
     const result = await sendEmailViaSMTP(to, "OTP Verification", `Your OTP is ${otp}`);
     console.log("✅ EMAIL SENT");
+=======
+    const transporter = createTransporter();
+
+    const result = await transporter.sendMail({
+      from: '"Music App" <kshirasagarvishal1@gmail.com>',
+      to,
+      subject: "OTP Verification - Music App",
+      text: `Your OTP is ${otp}. It expires in 5 minutes.`,
+      html: `<h2>Your OTP is <strong>${otp}</strong></h2><p>It expires in 5 minutes.</p>`
+    });
+
+    console.log("✅ EMAIL SENT:", result.messageId);
+>>>>>>> a713bd5 (fixed)
     return result;
   } catch (err) {
     console.log("❌ EMAIL ERROR DETAILS:");
@@ -145,6 +181,7 @@ async function sendOTPEmail(to, otp) {
 
 async function sendPasswordResetOTPEmail(to, otp) {
   console.log("🚀 PASSWORD RESET EMAIL START");
+<<<<<<< HEAD
   try {
     const result = await sendEmailViaSMTP(
       to, 
@@ -155,9 +192,35 @@ async function sendPasswordResetOTPEmail(to, otp) {
     return result;
   } catch (err) {
     console.log("❌ PASSWORD RESET EMAIL ERROR:", err.message);
+=======
+
+  try {
+    const transporter = createTransporter();
+
+    const result = await transporter.sendMail({
+      from: '"Music App" <kshirasagarvishal1@gmail.com>',
+      to,
+      subject: "Password Reset OTP - Music App",
+      text: `Your password reset OTP is ${otp}. It expires in 5 minutes.`,
+      html: `<h2>Password Reset OTP: <strong>${otp}</strong></h2><p>Expires in 5 minutes. If you did not request this, ignore.</p>`
+    });
+
+    console.log("✅ PASSWORD RESET EMAIL SENT:", result.messageId);
+    return result;
+
+  } catch (err) {
+    console.log("❌ PASSWORD RESET EMAIL ERROR DETAILS:");
+    console.log("NAME:", err.name);
+    console.log("MESSAGE:", err.message);
+    console.log("CODE:", err.code);
+
+>>>>>>> a713bd5 (fixed)
     throw new Error("Password reset email service failed");
   }
 }
 
 module.exports = { sendOTPEmail, sendPasswordResetOTPEmail };
+<<<<<<< HEAD
 
+=======
+>>>>>>> a713bd5 (fixed)
