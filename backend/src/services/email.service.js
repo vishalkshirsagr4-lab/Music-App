@@ -1,135 +1,103 @@
-const tls = require('tls');
+const nodemailer = require("nodemailer");
 
-const user = 'kshirasagarvishal1@gmail.com';
-const pass = 'puiv qujh mgwn tgbe';
+function createTransporter() {
+  const user = process.env.EMAIL_USER || 'kshirasagarvishal1@gmail.com';
+  const pass = process.env.EMAIL_PASS || 'puiv qujh mgwn tgbe';
 
-console.log("🔵 EMAIL_USER:", user);
-console.log("🔵 EMAIL_PASS EXISTS:", !!pass);
+  console.log("🔵 SMTP Config loaded");
 
-if (!user || !pass) {
-  throw new Error("EMAIL env missing in Render");
-}
-
-async function readResponse(socket) {
-  return new Promise((resolve, reject) => {
-    let data = '';
-    const timeout = setTimeout(() => {
-      socket.destroy();
-      reject(new Error('SMTP timeout'));
-    }, 10000);
-
-    const onData = (chunk) => {
-      data += chunk.toString();
-      if (data.includes('\\n') && data.match(/^[245][0-9]{2}/)) {
-        clearTimeout(timeout);
-        socket.removeListener('data', onData);
-        resolve(data);
-      }
-    };
-
-    socket.on('data', onData);
-    socket.once('error', reject);
-  });
-}
-
-async function sendSMTP(to, subject, body) {
-  return new Promise((resolve, reject) => {
-    const socket = tls.connect({
-      socketType: 'smtp',
-      host: 'smtp.gmail.com',
-      port: 465,
-      rejectUnauthorized: false
-    }, async () => {
-      try {
-        // Read greeting
-        let response = await readResponse(socket);
-        console.log('SMTP 220:', response.trim());
-
-        // EHLO
-        socket.write('EHLO musicapp\\r\\n');
-        response = await readResponse(socket);
-        console.log('SMTP EHLO:', response.trim());
-
-        // AUTH LOGIN
-        socket.write('AUTH LOGIN\\r\\n');
-        response = await readResponse(socket);
-        console.log('SMTP AUTH:', response.trim());
-
-        // User b64
-        const userB64 = Buffer.from(user).toString('base64');
-        socket.write(userB64 + '\\r\\n');
-        response = await readResponse(socket);
-        console.log('SMTP USER:', response.trim());
-
-        // Pass b64
-        const passB64 = Buffer.from(pass).toString('base64');
-        socket.write(passB64 + '\\r\\n');
-        response = await readResponse(socket);
-        console.log('SMTP 235 Auth OK:', response.trim());
-
-        // MAIL FROM
-        socket.write(`MAIL FROM:<${user}>\\r\\n`);
-        response = await readResponse(socket);
-        console.log('SMTP MAIL FROM:', response.trim());
-
-        // RCPT TO
-        socket.write(`RCPT TO:<${to}>\\r\\n`);
-        response = await readResponse(socket);
-        console.log('SMTP RCPT:', response.trim());
-
-        // DATA
-        socket.write('DATA\\r\\n');
-        response = await readResponse(socket);
-        console.log('SMTP DATA:', response.trim());
-
-        // Message
-        const headers = `From: ${user}\\r\\nTo: ${to}\\r\\nSubject: ${subject}\\r\\nContent-Type: text/plain; charset=utf-8\\r\\n\\r\\n`;
-        socket.write(headers + body + '\\r\\n.\\r\\n');
-        response = await readResponse(socket);
-        console.log('SMTP Queued:', response.trim());
-
-        // QUIT
-        socket.write('QUIT\\r\\n');
-        response = await readResponse(socket);
-        console.log('SMTP QUIT:', response.trim());
-
-        socket.end();
-        resolve({ success: true, messageId: 'native-smtp-' + Date.now() });
-
-      } catch (err) {
-        socket.destroy();
-        reject(err);
-      }
-    });
-
-    socket.on('error', reject);
-    socket.setTimeout(30000);
+  return nodemailer.createTransporter({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true for 465, false for other
+    auth: {
+      user,
+      pass
+    },
+    connectionTimeout: 10000,
+    socketTimeout: 10000,
+    pool: true,
+    maxConnections: 1,
+    maxMessages: 5
   });
 }
 
 async function sendOTPEmail(to, otp) {
-  console.log("🚀 OTP EMAIL START");
+  console.log("🚀 OTP EMAIL START to:", to);
+  
+  let transporter;
   try {
-    const result = await sendSMTP(to, "OTP Verification", `Your OTP is ${otp}`);
-    console.log("✅ EMAIL SENT:", result.messageId);
+    transporter = createTransporter();
+    
+    const result = await transporter.sendMail({
+      from: `"Music App" <${user}>`,
+      to,
+      subject: "Your OTP Code - Music App",
+      text: `Your OTP is ${otp}. Valid for 5 minutes.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
+          <h2 style="color: #333;">Your OTP Code</h2>
+          <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 10px; color: #495057;">
+            ${otp}
+          </div>
+          <p style="color: #666;">This code expires in 5 minutes.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p>If you didn't request this, ignore this email.</p>
+        </div>
+      `
+    });
+
+    console.log("✅ OTP EMAIL SENT:", result.messageId);
     return result;
-  } catch (err) {
-    console.log("❌ EMAIL ERROR:", err.message);
-    console.log("NAME:", err.name);
-    console.log("CODE:", err.code);
-    throw new Error("Email service failed");
+  } catch (error) {
+    console.error("❌ OTP EMAIL ERROR:", {
+      message: error.message,
+      code: error.code,
+      responseCode: error.responseCode,
+      response: error.response
+    });
+    throw error;
+  } finally {
+    if (transporter) transporter.close();
   }
 }
 
 async function sendPasswordResetOTPEmail(to, otp) {
-  console.log("🚀 PASSWORD RESET EMAIL START");
+  console.log("🚀 PASSWORD RESET EMAIL START to:", to);
+  
+  let transporter;
   try {
-    const result = await sendSMTP(to, "Password Reset OTP", `Your password reset OTP is ${otp}. Expires in 5 minutes.`);
+    transporter = createTransporter();
+    
+    const result = await transporter.sendMail({
+      from: `"Music App" <${user}>`,
+      to,
+      subject: "Password Reset Code - Music App",
+      text: `Your password reset OTP is ${otp}. Valid for 5 minutes.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
+          <h2 style="color: #333;">Password Reset Code</h2>
+          <div style="background: #f8f9fa; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 10px; color: #495057;">
+            ${otp}
+          </div>
+          <p style="color: #666;">This code expires in 5 minutes.</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p>If you didn't request this, safely ignore this email.</p>
+        </div>
+      `
+    });
+
     console.log("✅ PASSWORD RESET EMAIL SENT:", result.messageId);
     return result;
-  } catch (err) {
-    console.log("❌ PASSWORD RESET ERROR:", err.message);
-    throw new Error("Password reset email service failed");
+  } catch (error) {
+    console.error("❌ PASSWORD RESET EMAIL ERROR:", {
+      message: error.message,
+      code: error.code,
+      responseCode: error.responseCode
+    });
+    throw error;
+  } finally {
+    if (transporter) transporter.close();
   }
 }
 
