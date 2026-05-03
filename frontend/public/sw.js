@@ -1,4 +1,4 @@
-const CACHE_NAME = 'music-app-v3'; // Bump for Vercel
+const CACHE_NAME = 'music-app-v4'; // Updated cache version
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -6,64 +6,109 @@ const STATIC_ASSETS = [
   '/manifest.json',
   '/icon-192x192.png',
   '/icon-512x512.png',
-  '/favicon.svg'
+  '/favicon.svg',
+  '/icons.svg',
+  '/icon-source.svg'
 ];
 
 // Install
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting())
+      .then(cache => cache.addAll(STATIC_ASSETS))
   );
 });
 
 // Activate
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => 
+    caches.keys().then(cacheNames => 
       Promise.all(
-        cacheNames.filter((name) => name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
+        cacheNames
+          .filter(name => name !== CACHE_NAME)
+          .map(name => caches.delete(name))
       )
-    ).then(() => self.clients.claim())
+    )
   );
+  self.clients.claim();
 });
 
-// Fetch - Enhanced SPA support
+// Fetch - Fixed Response cloning issue
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
+  const request = event.request;
   
-  if (request.method !== 'GET') return;
-  if (new URL(request.url).origin !== self.location.origin) return;
+  // Skip non-GET requests
+  if (request.method !== 'GET') {
+    event.respondWith(fetch(request));
+    return;
+  }
+  
+  // Skip cross-origin requests
+  if (new URL(request.url).origin !== self.location.origin) {
+    event.respondWith(fetch(request));
+    return;
+  }
 
-  // API - Network First
+  // API requests - Network first, safe caching
   if (request.url.includes('/api/')) {
-    event.respondWith(
-      fetch(request).then((resp) => {
-        if (resp.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, resp.clone()));
-        return resp;
-      }).catch(() => caches.match(request) || Response.error())
-    );
+    event.respondWith(handleApiRequest(request));
     return;
   }
 
-  // SPA Routes - index.html fallback (FIX 404 REFRESH)
+  // Document requests - SPA fallback
   if (request.mode === 'navigate' || request.destination === 'document') {
-    event.respondWith(
-      fetch(request).catch(() => caches.match('/index.html'))
-    );
+    event.respondWith(handleDocumentRequest(request));
     return;
   }
 
-  // Static - Cache First
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((resp) => {
-        if (resp.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, resp.clone()));
-        return resp;
-      });
-    }).catch(() => caches.match('/offline.html'))
-  );
+  // Static assets - Cache first
+  event.respondWith(handleStaticRequest(request));
 });
+
+// API handler - Fixed cloning bug
+async function handleApiRequest(request) {
+  try {
+    const response = await fetch(request);
+    
+    // Only cache successful API responses
+    if (response.ok && response.status !== 404) {
+      const cache = await caches.open(CACHE_NAME);
+      const clonedResponse = response.clone();
+      await cache.put(request, clonedResponse);
+    }
+    
+    return response;
+  } catch (error) {
+    console.log('SW: API offline, serving cache:', request.url);
+    return caches.match(request) || new Response('Offline', { status: 503 });
+  }
+}
+
+// Document handler
+async function handleDocumentRequest(request) {
+  try {
+    const response = await fetch(request);
+    return response || caches.match('/index.html');
+  } catch {
+    return caches.match('/index.html') || caches.match('/offline.html');
+  }
+}
+
+// Static handler
+async function handleStaticRequest(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+  
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    return caches.match('/offline.html');
+  }
+}
+
