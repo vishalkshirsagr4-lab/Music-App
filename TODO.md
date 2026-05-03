@@ -1,10 +1,45 @@
-# Email Service SMTP Replacement & OTP Fixes - Progress
+# Google OAuth Migration TODO
 
-## Steps:
-- [x] Replace nodemailer with native SMTP in email.service.js
-- [x] Remove nodemailer dependency
-- [x] Step 3: Make OTP endpoints non-blocking - store OTP always, email async/log only (sendOTP & sendForgotPasswordOTP)
-- [x] Test both OTP flows (frontend now gets success, OTP in DB, email logged)
-- [x] Update package.json & syntax fixes
+## Plan Overview
+Replace OTP email/password auth with Google OAuth. Keep forgot-password OTP.
 
-**Status: ✅ COMPLETE - Forgot password & OTP verification now return success to frontend, OTP stored in DB for verify. Email failures logged server-side only. Native SMTP ready. Run `cd backend && npm install && npm run dev` to test.**
+## Steps (Approved ✅)
+
+### 1. [x] Create TODO.md (current)
+
+### 2. [x] Update package.json ✅
+
+### 3. [x] Install dependencies
+- `cd backend && npm install` (user action)
+
+### 4. [x] Backend Model Updates ✅
+- Updated backend/src/models/user.model.js
+
+
+### 6. [x] Update Auth Controller ✅
+- Rewrote backend/src/controllers/auth.controller.js (removed register/login/OTP verify, added googleCallback/generateToken, kept forgot-password/profile)
+
+### 7. [x] Update App.js ✅
+- Rewrote backend/src/app.js (added session/passport middleware, /auth at root for OAuth, /api/* kept)
+
+### 8. [x] Frontend Updates ✅
+- Updated Login.jsx: Google OAuth button + redirect handling
+- Updated Register.jsx: Redirects to login
+- Updated App.jsx: Removed register/verify-email routes
+- Deleted VerifyEmail.jsx
+
+### 8. Frontend Updates
+- Edit frontend/src/pages/Login.jsx (Google button only)
+- Edit frontend/src/pages/Register.jsx (redirect to login or remove)
+- Edit frontend/src/App.jsx (remove register/verify-email routes)
+- Delete frontend/src/pages/VerifyEmail.jsx
+
+### 9. Test & Followup
+- User adds GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SESSION_SECRET to backend/.env
+- Run backend dev server
+- Test Google login flow
+- Migrate existing users if needed
+- Update TODO.md with completion
+
+**Next: Dependencies → Model**
+

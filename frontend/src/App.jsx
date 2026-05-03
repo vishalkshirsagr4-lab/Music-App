@@ -6,8 +6,6 @@ import { AudioPlayerProvider } from "./context/AudioPlayerContext";
 
 // Lazy load all page components
 const Login = lazy(() => import("./pages/Login"));
-const Register = lazy(() => import("./pages/Register"));
-const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Player = lazy(() => import("./pages/Player"));
@@ -49,8 +47,6 @@ function App() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

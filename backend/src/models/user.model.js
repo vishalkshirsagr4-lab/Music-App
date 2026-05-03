@@ -7,14 +7,22 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    name: {
+        type: String,
+    },
     email: {
         type: String,
         required: true,
         unique: true,
     },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
     password: {
         type: String,
-        required: true,
+        // optional for Google users
     },
     role: {
         type: String,
@@ -30,11 +38,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     default:
       "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-  },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
-    }
+  }
 })
 
 
