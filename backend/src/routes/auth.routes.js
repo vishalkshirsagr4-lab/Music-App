@@ -12,9 +12,20 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 router.get('/google/callback', 
   passport.authenticate('google', { 
     session: false, 
-    failureRedirect: 'http://localhost:5173/login?error=auth-failed' 
+    failureRedirect: 'https://music-app-chi-opal.vercel.app/login' 
   }), 
-  authController.googleCallback
+  (req, res) => {
+    const user = req.user;
+    const jwt = require("jsonwebtoken");
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+    return res.redirect(
+      `https://music-app-chi-opal.vercel.app/login/success?token=${token}&role=${user.role}`
+    );
+  }
 );
 
 // API routes (/api/auth/...)
