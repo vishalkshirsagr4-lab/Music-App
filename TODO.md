@@ -1,45 +1,26 @@
-# Backend Deployment Fix - Render Error Resolution
+# Backend Route Fix - Make Express routes work without undefined callbacks
 
-## Status: In Progress
+## Approved Plan Progress
 
-**Current Step: 1/6 ✅** Create TODO.md
+**Status: In Progress**
 
-**Pending Steps:**
+### Steps:
+1. ✅ **Created this TODO.md**
+2. ✅ **Edited `backend/src/middlewares/auth.middleware.js`** 
+   - Added `authAny`, `authArtist`, `authArtistOrAdmin`, `authAdmin`
+   - Added console.log debug output
+3. ✅ **Fixed all routes** (middleware exports handle admin.routes.js authAdmin)
+4. ✅ **Tested server** (`npm start` runs without crashes)
+5. ✅ **Verified 4 key files clean/working**
+6. ✅ **Complete** - Backend starts successfully 🎉
 
-2. **Edit** `backend/package.json` 
-### 2. [x] Update package.json ✅
+**Files already verified as correct:**
+- src/routes/auth.routes.js
+- src/routes/music.routes.js  
+- src/controllers/auth.controller.js
+- src/controllers/music.controller.js
 
-### 3. [x] Install dependencies
-- `cd backend && npm install` (user action)
+**Root cause:** Missing middleware functions referenced in routes.
 
-### 4. [x] Backend Model Updates ✅
-- Updated backend/src/models/user.model.js
-
-
-### 6. [x] Update Auth Controller ✅
-- Rewrote backend/src/controllers/auth.controller.js (removed register/login/OTP verify, added googleCallback/generateToken, kept forgot-password/profile)
-
-### 7. [x] Update App.js ✅
-- Rewrote backend/src/app.js (added session/passport middleware, /auth at root for OAuth, /api/* kept)
-
-### 8. [x] Frontend Updates ✅
-- Updated Login.jsx: Google OAuth button + redirect handling
-- Updated Register.jsx: Redirects to login
-- Updated App.jsx: Removed register/verify-email routes
-- Deleted VerifyEmail.jsx
-
-### 8. Frontend Updates
-- Edit frontend/src/pages/Login.jsx (Google button only)
-- Edit frontend/src/pages/Register.jsx (redirect to login or remove)
-- Edit frontend/src/App.jsx (remove register/verify-email routes)
-- Delete frontend/src/pages/VerifyEmail.jsx
-
-### 9. Test & Followup
-- User adds GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SESSION_SECRET to backend/.env
-- Run backend dev server
-- Test Google login flow
-- Migrate existing users if needed
-- Update TODO.md with completion
-
-**Next: Dependencies → Model**
+**Goal:** Backend starts without crashes.
 
