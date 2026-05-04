@@ -24,23 +24,15 @@ function generateToken(user) {
 async function googleCallback(req, res) {
   const user = req.user;
   if (!user) {
-    return res.status(401).json({ error: 'Authentication failed' });
+    const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? 'https://music-app-chi-opal.vercel.app' : 'http://localhost:5173');
+    return res.redirect(`${frontendUrl}/#login?error=auth-failed`);
   }
 
-  const { token, cookieOptions } = generateToken(user);
+  const { token } = generateToken(user);
 
-  res.cookie("token", token, cookieOptions);
-  res.json({
-    success: true,
-    token,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar
-    }
-  });
+  const frontendUrl = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? 'https://music-app-chi-opal.vercel.app' : 'http://localhost:5173');
+  const redirectUrl = `${frontendUrl}/#login/success?token=${token}&role=${user.role}`;
+  res.redirect(redirectUrl);
 }
 
 async function logoutUser(req, res) {

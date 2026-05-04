@@ -57,7 +57,7 @@ export default function Login() {
 
         <div className="space-y-2 text-sm text-gray-400">
           <a 
-            href="http://localhost:5000/api/auth/forgot-password" 
+            href="https://music-app-0r90.onrender.com/api/auth/forgot-password" 
             className="block hover:text-white transition text-[#1db954]"
           >
             Forgot password?
