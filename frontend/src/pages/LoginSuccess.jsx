@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 
 export default function LoginSuccess() {
   const [searchParams] = useSearchParams();
@@ -9,52 +8,19 @@ export default function LoginSuccess() {
   useEffect(() => {
     const token = searchParams.get('token');
     const role = searchParams.get('role');
-    
-    if (token && role) {
-      // Store token
-      localStorage.setItem('token', token);
-      
-      // Fetch user info to store full user object (ProtectedRoute expects it)
-      const verifyUser = async () => {
-        try {
-          const response = await fetch('https://music-app-0r90.onrender.com/api/auth/me', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('user', JSON.stringify(data.user));
-            toast.success('Login successful!');
-            
-            // Role-based redirect
-            switch (role) {
-              case 'admin':
-                navigate('/admin');
-                break;
-              case 'artist':
-                navigate('/artist');
-                break;
-              default:
-                navigate('/dashboard');
-            }
-          } else {
-            toast.error('Login verification failed');
-            localStorage.removeItem('token');
-            navigate('/');
-          }
-        } catch (error) {
-          toast.error('Login failed');
-          localStorage.removeItem('token');
-          navigate('/');
-        }
-      };
-      
-      verifyUser();
+
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('role', role || 'user');
+
+    if (role === 'admin') {
+      navigate('/admin/dashboard');
     } else {
-      toast.error('Invalid login - missing token');
-      navigate('/');
+      navigate('/user/home');
     }
   }, [searchParams, navigate]);
 

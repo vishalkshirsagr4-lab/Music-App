@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { HashRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AudioPlayerProvider } from "./context/AudioPlayerContext";
@@ -49,10 +49,17 @@ function App() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Login />} />
-<Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/login/success" element={<LoginSuccess />} />
 
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/user/home" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/admin/dashboard" element={
+              <ProtectedRoute role="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
 
             <Route path="/player/:id" element={<ProtectedRoute><Player /></ProtectedRoute>} />
             <Route path="/album/:id" element={<ProtectedRoute><AlbumPage /></ProtectedRoute>} />
