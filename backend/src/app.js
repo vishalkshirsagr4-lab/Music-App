@@ -36,21 +36,8 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Session middleware for Passport
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-session-secret-key-change-this',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    sameSite: 'lax'
-  }
-}));
-
-// Passport middleware
+// Passport middleware (JWT + OAuth stateless)
 app.use(passport.initialize());
-app.use(passport.session());
 
 // OAuth routes at root /auth (for callback)
 app.use('/auth', authRoutes);

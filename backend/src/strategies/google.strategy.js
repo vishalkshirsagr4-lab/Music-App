@@ -1,7 +1,8 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport = require('passport');
 const userModel = require('../models/user.model');
-const jwt = require('jsonwebtoken');
+
+const adminEmails = process.env.ADMIN_EMAILS ? process.env.ADMIN_EMAILS.split(',').map(email => email.trim().toLowerCase()) : [];
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
@@ -23,37 +24,26 @@ passport.use(new GoogleStrategy({
         email: profile.emails[0].value,
         avatar: profile.photos[0]?.value || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
         username: profile.displayName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(Math.random() * 1000),
-        role: 'user',
+        role: adminEmails.includes(profile.emails[0].value.toLowerCase()) ? 'admin' : 'user',
         artistRequestStatus: 'none'
       });
     } else {
-      // Update existing user
+      // Update existing user role if admin email
+      if (adminEmails.includes(profile.emails[0].value.toLowerCase()) && user.role !== 'admin') {
+        user.role = 'admin';
+        await user.save();
+      }
       user.googleId = profile.id;
       user.name = profile.displayName;
       user.avatar = profile.photos[0]?.value || user.avatar;
       await user.save();
     }
 
-    // Serialize user id to session
-    done(null, user._id);
+    done(null, user);
   } catch (err) {
     done(err, null);
   }
 }));
 
-// Serialize user to session
-passport.serializeUser((userId, done) => {
-  done(null, userId);
-});
-
-// Deserialize from session
-passport.deserializeUser(async (userId, done) => {
-  try {
-    const user = await userModel.findById(userId).select('-password');
-    done(null, user);
-  } catch (err) {
-    done(err, null);
-  }
-});
-
 module.exports = passport;
+

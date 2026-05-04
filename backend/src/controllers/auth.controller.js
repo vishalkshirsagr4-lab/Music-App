@@ -22,17 +22,25 @@ function generateToken(user) {
 }
 
 async function googleCallback(req, res) {
-  // This is called after passport.authenticate success
-  // User is attached to req.user by deserializeUser
   const user = req.user;
   if (!user) {
-    return res.redirect('http://localhost:5173/login?error=no-user');
+    return res.status(401).json({ error: 'Authentication failed' });
   }
 
   const { token, cookieOptions } = generateToken(user);
 
   res.cookie("token", token, cookieOptions);
-  res.redirect(`http://localhost:5173/dashboard?login=success`);
+  res.json({
+    success: true,
+    token,
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar
+    }
+  });
 }
 
 async function logoutUser(req, res) {
@@ -65,6 +73,20 @@ async function getMe(req, res) {
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
+}
+
+// Alias for /user/profile
+async function userProfile(req, res) {
+  await getMe(req, res);
+}
+
+// Admin dashboard
+async function adminDashboard(req, res) {
+  res.json({ 
+    message: 'Admin dashboard',
+    user: req.user,
+    role: req.user.role 
+  });
 }
 
 async function updateMe(req, res) {
@@ -251,6 +273,8 @@ module.exports = {
   googleCallback, 
   logoutUser, 
   getMe, 
+  userProfile,
+  adminDashboard,
   updateMe, 
   requestArtist, 
   sendForgotPasswordOTP, 
