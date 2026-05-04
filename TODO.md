@@ -1,12 +1,12 @@
-# Google OAuth Migration TODO
+# Backend Deployment Fix - Render Error Resolution
 
-## Plan Overview
-Replace OTP email/password auth with Google OAuth. Keep forgot-password OTP.
+## Status: In Progress
 
-## Steps (Approved ✅)
+**Current Step: 1/6 ✅** Create TODO.md
 
-### 1. [x] Create TODO.md (current)
+**Pending Steps:**
 
+2. **Edit** `backend/package.json` 
 ### 2. [x] Update package.json ✅
 
 ### 3. [x] Install dependencies
