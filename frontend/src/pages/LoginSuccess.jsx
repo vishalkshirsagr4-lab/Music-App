@@ -17,16 +17,15 @@ export default function LoginSuccess() {
       // Fetch user info to store full user object (ProtectedRoute expects it)
       const verifyUser = async () => {
         try {
-          const response = fetch('https://music-app-0r90.onrender.com/api/auth/me', {
+          const response = await fetch('https://music-app-0r90.onrender.com/api/auth/me', {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
           
-          const res = await response;
-          if (res.ok) {
-            const user = await res.json();
-            localStorage.setItem('user', JSON.stringify(user.user));
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('user', JSON.stringify(data.user));
             toast.success('Login successful!');
             
             // Role-based redirect
