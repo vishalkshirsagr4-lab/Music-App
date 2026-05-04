@@ -37,7 +37,7 @@ export default function Login() {
         </div>
 
         <a 
-          href="http://localhost:5000/auth/google"
+          href="https://music-app-0r90.onrender.com/auth/google"
           className="w-full bg-white text-black py-4 px-6 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 hover:shadow-xl hover:shadow-white/10 transition-all duration-200 group"
         >
           <svg className="w-6 h-6 group-hover:scale-110 transition" viewBox="0 0 24 24">
