@@ -23,18 +23,19 @@ const allowedOrigins = (process.env.CLIENT_URL || "https://music-app-chi-opal.ve
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(null, true); // allow in production to prevent CORS blocking on Render
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
+// Ensure preflight requests are handled before route handlers
+app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
+
 
 // Passport middleware (JWT + OAuth stateless)
 app.use(passport.initialize());
