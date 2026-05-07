@@ -3,14 +3,14 @@ const userModel = require('../models/user.model');
 
 const authMiddleware = async (req, res, next) => {
   try {
-    let token = req.cookies.token;
+    // Prefer Authorization header, then fallback to cookie token
+    let token = undefined;
 
-    // Check Authorization header if no cookie token
-    if (!token) {
-      const authHeader = req.headers.authorization;
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        token = authHeader.substring(7);
-      }
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
     }
 
     if (!token) {
@@ -19,6 +19,7 @@ const authMiddleware = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await userModel.findById(decoded.id).select('-password');
+
     if (!user) {
       return res.status(401).json({ message: 'Invalid token' });
     }
@@ -26,9 +27,10 @@ const authMiddleware = async (req, res, next) => {
     req.user = { id: user._id, role: user.role };
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Invalid token' });
+    return res.status(401).json({ message: 'Invalid token' });
   }
 };
+
 
 
 
