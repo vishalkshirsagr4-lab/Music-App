@@ -43,11 +43,16 @@ app.use(passport.initialize());
 app.use('/auth', authRoutes);
 
 // API routes at /api/*
+// NOTE: authRoutes are mounted under /auth for OAuth callback.
+// Frontend expects /api/auth/... endpoints too.
+app.use('/api/auth', authRoutes);
+
 app.use('/api/music', musicRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/sections', sectionRoutes);
 app.use('/api/test', require('./routes/test.routes'));
+
 
 // 404 handler
 app.use((req, res) => {
