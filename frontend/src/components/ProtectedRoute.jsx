@@ -3,19 +3,48 @@ import { Navigate, useLocation } from "react-router-dom";
 import API from "../utils/api";
 
 export default function ProtectedRoute({ children, role, allowAdmin }) {
-  const [verifiedUser, setVerifiedUser] = useState(null);
+  const [verifiedUser, setVerifiedUser] = useState(() => {
+    // Use cached user immediately to avoid redirect flicker/loops right after login.
+    const cached = localStorage.getItem("user");
+    if (!cached) return null;
+    try {
+      return JSON.parse(cached);
+    } catch {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(true);
+
   const location = useLocation();
 
   useEffect(() => {
     const verifyUser = async () => {
+      // Prevent redirect loops caused by race conditions during login-success.
+      // If we already have a token, keep trying to verify until backend responds.
+      const tokenInStorage = localStorage.getItem("token");
+
       try {
+        if (!tokenInStorage) {
+          setVerifiedUser(null);
+          return;
+        }
+
         const res = await API.get("/auth/me");
         const freshUser = res.data.user;
         localStorage.setItem("user", JSON.stringify(freshUser));
         setVerifiedUser(freshUser);
       } catch (err) {
-        // Backend verification failed
+        // Backend verification failed (token invalid/expired/missing cookie)
+        // Don't clear token aggressively: first, attempt to still render based on cached user.
+        // Clearing token can cause an immediate redirect loop right after login.
+        const cachedUserRaw = localStorage.getItem("user");
+        const cachedUser = cachedUserRaw ? JSON.parse(cachedUserRaw) : null;
+
+        if (cachedUser) {
+          setVerifiedUser(cachedUser);
+          return;
+        }
+
         localStorage.removeItem("user");
         localStorage.removeItem("token");
         setVerifiedUser(null);
@@ -23,8 +52,10 @@ export default function ProtectedRoute({ children, role, allowAdmin }) {
         setLoading(false);
       }
     };
+
     verifyUser();
   }, [location.pathname]);
+
 
   if (loading) {
     return (
