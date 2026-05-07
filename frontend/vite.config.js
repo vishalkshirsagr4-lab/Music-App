@@ -4,7 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: './', // Vercel SPA paths
+  base: '/', // Ensures JS/CSS chunk URLs resolve correctly on Vercel refresh/OAuth routes
+
   preview: {
     port: 4173,
     strictPort: true,
