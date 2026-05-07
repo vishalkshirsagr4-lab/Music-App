@@ -3,7 +3,16 @@ const userModel = require('../models/user.model');
 
 const authMiddleware = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    let token = req.cookies.token;
+
+    // Check Authorization header if no cookie token
+    if (!token) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
+
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
     }

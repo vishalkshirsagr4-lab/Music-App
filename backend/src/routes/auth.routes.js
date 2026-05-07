@@ -44,7 +44,6 @@ router.post('/forgot-password/reset', authController.resetPassword);
 
 // Protected routes per spec
 // NOTE: frontend calls GET /api/auth/me
-router.get('/me', authMiddleware, authController.getMe);
 router.get('/admin/dashboard', authMiddleware, isAdmin, authController.adminDashboard);
 router.get('/user/profile', authMiddleware, authController.userProfile);
 
