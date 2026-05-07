@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import API from "../utils/api";
 
 export default function LoginSuccess() {
   const [searchParams] = useSearchParams();
@@ -17,11 +18,26 @@ export default function LoginSuccess() {
     localStorage.setItem('token', token);
     localStorage.setItem('role', role || 'user');
 
-    if (role === 'admin') {
-      navigate('/admin/dashboard');
-    } else {
-      navigate('/user/home');
-    }
+    // Fetch user data immediately to cache it
+    API.get("/auth/me")
+      .then((res) => {
+        const user = res.data.user;
+        localStorage.setItem("user", JSON.stringify(user));
+        if (role === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/user/home');
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch user:", err);
+        // Still navigate, let ProtectedRoute handle
+        if (role === 'admin') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/user/home');
+        }
+      });
   }, [searchParams, navigate]);
 
   return (

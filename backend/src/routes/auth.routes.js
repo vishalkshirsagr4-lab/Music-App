@@ -13,7 +13,7 @@ router.get(
   '/google/callback',
   passport.authenticate('google', {
     session: false,
-    failureRedirect: 'https://music-app-chi-opal.vercel.app/login'
+    failureRedirect: process.env.FRONTEND_URL || 'https://music-app-chi-opal.vercel.app/login'
   }),
   (req, res) => {
     const user = req.user;
@@ -25,8 +25,9 @@ router.get(
       { expiresIn: '7d' }
     );
 
+    const frontendUrl = process.env.FRONTEND_URL || 'https://music-app-chi-opal.vercel.app';
     return res.redirect(
-      `https://music-app-chi-opal.vercel.app/login/success?token=${token}&role=${user.role}`
+      `${frontendUrl}/login/success?token=${token}&role=${user.role}`
     );
   }
 );
